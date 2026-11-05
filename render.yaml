@@ -1,0 +1,48 @@
+# Render Blueprint — Dashboard → New → Blueprint → এই repo সিলেক্ট করুন
+services:
+  - type: web
+    name: hullor-api
+    runtime: python
+    plan: free
+    region: singapore
+    buildCommand: ./build.sh
+    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 60
+    healthCheckPath: /api/health/
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.5
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      # ---- Supabase Postgres (Session pooler connection string) ----
+      - key: DATABASE_URL
+        sync: false
+      # ---- Vercel এর URL, কমা দিয়ে একাধিক দেওয়া যায় (শেষে / দেবেন না) ----
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      # ---- প্রথম admin অ্যাকাউন্ট (deploy এ অটো তৈরি হয়) ----
+      - key: ADMIN_PHONE
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_NAME
+        value: Admin
+      # ---- Supabase Storage (ছবি আপলোড) ----
+      - key: SUPABASE_S3_ENDPOINT
+        sync: false
+      - key: SUPABASE_S3_REGION
+        sync: false
+      - key: SUPABASE_S3_ACCESS_KEY
+        sync: false
+      - key: SUPABASE_S3_SECRET_KEY
+        sync: false
+      - key: SUPABASE_S3_BUCKET
+        value: hullor_images
+      - key: SUPABASE_S3_PUBLIC_DOMAIN
+        sync: false
+      # ---- SMS / OTP (BulkSMSBD) — মান Render ড্যাশবোর্ডে বসান, কোডে/GitHub এ নয় ----
+      - key: BULKSMSBD_API_KEY
+        sync: false
+      - key: BULKSMSBD_SENDER_ID
+        sync: false
